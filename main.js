@@ -1,6 +1,6 @@
 const operationField = document.querySelector('.calculator');
 const display = document.querySelector('.display');
-const resultButton = document.querySelector('.result-button');
+let separator = false;
 let firstOperand = '';
 let secondOperand = '';
 let operator = '';
@@ -12,42 +12,59 @@ operationField.addEventListener('click', getValueOfPressedButton);
 
 function getValueOfPressedButton(event) {
     let pressedButton = event.target;
-    console.log(intermediateResult);
     if (firstOperand.length < 9 && pressedButton.classList.contains('operand') && !operator) {
         firstOperand += pressedButton.innerText;
         display.innerText = firstOperand;
     } else if (intermediateResult && !secondOperand) {
         firstOperand = intermediateResult;
-        console.log(firstOperand);
-    }
-
-    if (pressedButton.classList.contains('operator') && secondOperand) {
-        getIntermediateResult();
-        operator = pressedButton.innerText;
-        console.log(operator);
-        display.innerText += operator;
-    }
-
-    if (!!firstOperand && pressedButton.classList.contains('operator') && !secondOperand) {
-        operator = '';
-        operator = pressedButton.innerText;
-        display.innerText = firstOperand + operator;
-    } 
-
-    if (!!firstOperand && operator && pressedButton.classList.contains('operand')) {
-        secondOperand += pressedButton.innerText;
-        console.log(secondOperand);
-        display.innerText = firstOperand + operator + secondOperand;
     }
     
+    if (firstOperand.length < 9 && firstOperand.length > 0 && pressedButton.classList.contains('separator') && !operator && !separator) {
+        firstOperand += pressedButton.innerText;
+        display.innerText = firstOperand;
+        separator = true;
+    } else if (firstOperand.length === 0 && pressedButton.classList.contains('separator') && !operator && !separator) {
+        firstOperand = 0 + pressedButton.innerText;
+        display.innerText = firstOperand;
+        separator = true;
+    }
+
+    if (pressedButton.classList.contains('operator')) {  
+        separator = false;      
+        getIntermediateResult();
+        operator = pressedButton.innerText;
+        display.innerText = intermediateResult + operator;
+    }
+
+    if (!!firstOperand && pressedButton.classList.contains('operator') && !secondOperand && !intermediateResult) {
+        operator = '';
+        operator = pressedButton.innerText;
+        display.innerText = firstOperand + operator;;
+    } 
+
+    if (secondOperand.length < 9 && !!firstOperand && operator && pressedButton.classList.contains('operand')) {
+        secondOperand += pressedButton.innerText;
+        display.innerText = firstOperand + operator + secondOperand;
+    }
+
+    if (secondOperand.length < 9 && secondOperand.length > 0 && !!firstOperand && operator && pressedButton.classList.contains('separator') && !separator) {
+        secondOperand += pressedButton.innerText;
+        display.innerText = firstOperand + operator + secondOperand;
+        separator = true;
+    } else if (secondOperand.length === 0 && pressedButton.classList.contains('separator') && operator && !separator) {
+        secondOperand = 0 + pressedButton.innerText;
+        display.innerText += secondOperand;
+        separator = true;
+    }
 
     if (pressedButton.classList.contains('result-button')) {
+        separator = false;
         if (!secondOperand) {
             display.innerText = firstOperand;
         } else {
-        getIntermediateResult();
-        display.innerText = intermediateResult.toFixed(8);
-        firstOperand = '';
+            getIntermediateResult();
+            display.innerText = intermediateResult.toFixed(8);
+            firstOperand = '';
         }
     }
 
@@ -57,18 +74,25 @@ function getValueOfPressedButton(event) {
     }
 
     if (pressedButton.classList.contains('square-root') && !secondOperand) {
-        display.innerText = Math.sqrt(firstOperand);
-        dataReset();
+        intermediateResult = Math.sqrt(firstOperand).toFixed(8);
+        display.innerText = intermediateResult;
     } else if (pressedButton.classList.contains('square-root') && secondOperand) {
-        display.innerText = 'Error';
+        getIntermediateResult();
+        intermediateResult = Math.sqrt(intermediateResult).toFixed(8);
+        display.innerText = intermediateResult;
     }
 
     if (firstOperand && !secondOperand && pressedButton.classList.contains('delete-number')) {
-        firstOperand = firstOperand.slice(0, -1);
+        firstOperand = firstOperand.length > 1 ? firstOperand.slice(0, -1) : 0;
         display.innerText = firstOperand;
+        if (firstOperand === 0) {
+            dataReset();
+            display.innerText = 0;
+        }        
     }
 
     if (secondOperand && pressedButton.classList.contains('delete-number')) {
+        console.log(secondOperand, firstOperand);
         secondOperand = secondOperand.slice(0, -1);
         display.innerText = firstOperand + operator + secondOperand;
     }
@@ -90,6 +114,7 @@ function dataReset() {
     secondOperand = '';
     intermediateResult = 0;
     operator = '';
+    separator = false;
 }
 
 function getIntermediateResult() {
@@ -111,5 +136,4 @@ function getIntermediateResult() {
 
     operator = '';
     secondOperand = '';
-    console.log(intermediateResult);
 }
