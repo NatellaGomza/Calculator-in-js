@@ -12,48 +12,50 @@ operationField.addEventListener('click', getValueOfPressedButton);
 
 function getValueOfPressedButton(event) {
     let pressedButton = event.target;
-    if (firstOperand.length < 9 && pressedButton.classList.contains('operand') && !operator) {
+    let enteringFirstOperand = pressedButton.classList.contains('operand') && !operator;
+
+    if (enteringFirstOperand) {
         firstOperand += pressedButton.innerText;
         display.innerText = firstOperand;
     } else if (intermediateResult && !secondOperand) {
         firstOperand = intermediateResult;
     }
-    
-    if (firstOperand.length < 9 && firstOperand.length > 0 && pressedButton.classList.contains('separator') && !operator && !separator) {
-        firstOperand += pressedButton.innerText;
-        display.innerText = firstOperand;
-        separator = true;
-    } else if (firstOperand.length === 0 && pressedButton.classList.contains('separator') && !operator && !separator) {
-        firstOperand = 0 + pressedButton.innerText;
+
+    let addingFractionalPartToFirstOperand = pressedButton.classList.contains('separator') && !operator && !separator;
+
+    if (addingFractionalPartToFirstOperand) {
+        firstOperand = firstOperand.length > 0 ? firstOperand += pressedButton.innerText : firstOperand = 0 + pressedButton.innerText;
         display.innerText = firstOperand;
         separator = true;
     }
 
-    if (pressedButton.classList.contains('operator')) {  
-        separator = false;      
+    if (pressedButton.classList.contains('operator')) {
+        separator = false;
         getIntermediateResult();
         operator = pressedButton.innerText;
         display.innerText = intermediateResult + operator;
     }
 
-    if (!!firstOperand && pressedButton.classList.contains('operator') && !secondOperand && !intermediateResult) {
+    let changingOperatorWhenOnlyFirstOperandExist = !secondOperand && !intermediateResult;
+
+    if (pressedButton.classList.contains('operator') && changingOperatorWhenOnlyFirstOperandExist) {
         operator = '';
         operator = pressedButton.innerText;
         display.innerText = firstOperand + operator;;
-    } 
+    }
 
-    if (secondOperand.length < 9 && !!firstOperand && operator && pressedButton.classList.contains('operand')) {
+    let enteringSecondOperand = !!firstOperand && operator && pressedButton.classList.contains('operand');
+
+    if (enteringSecondOperand) {
         secondOperand += pressedButton.innerText;
         display.innerText = firstOperand + operator + secondOperand;
     }
 
-    if (secondOperand.length < 9 && secondOperand.length > 0 && !!firstOperand && operator && pressedButton.classList.contains('separator') && !separator) {
-        secondOperand += pressedButton.innerText;
-        display.innerText = firstOperand + operator + secondOperand;
-        separator = true;
-    } else if (secondOperand.length === 0 && pressedButton.classList.contains('separator') && operator && !separator) {
-        secondOperand = 0 + pressedButton.innerText;
-        display.innerText += secondOperand;
+    let addingFractionalPartToSecondOperand = firstOperand && operator && !separator && pressedButton.classList.contains('separator');
+
+    if (addingFractionalPartToSecondOperand) {
+        secondOperand = secondOperand.length > 0 ? secondOperand += pressedButton.innerText : secondOperand = 0 + pressedButton.innerText;
+        display.innerText = secondOperand.length > 0 ? firstOperand + operator + secondOperand : display.innerText += secondOperand;
         separator = true;
     }
 
@@ -73,37 +75,32 @@ function getValueOfPressedButton(event) {
         display.innerText = 0;
     }
 
-    if (pressedButton.classList.contains('square-root') && !secondOperand) {
-        intermediateResult = Math.sqrt(firstOperand).toFixed(8);
-        display.innerText = intermediateResult;
-    } else if (pressedButton.classList.contains('square-root') && secondOperand) {
-        getIntermediateResult();
-        intermediateResult = Math.sqrt(intermediateResult).toFixed(8);
+    if (pressedButton.classList.contains('square-root')) {
+        intermediateResult = !secondOperand ? Math.sqrt(firstOperand).toFixed(8) : Math.sqrt(getIntermediateResult()).toFixed(8);
         display.innerText = intermediateResult;
     }
 
-    if (firstOperand && !secondOperand && pressedButton.classList.contains('delete-number')) {
+    let firstOperandExists = firstOperand && !secondOperand;
+
+    if (pressedButton.classList.contains('delete-number') && firstOperandExists) {
         firstOperand = firstOperand.length > 1 ? firstOperand.slice(0, -1) : 0;
         display.innerText = firstOperand;
-        if (firstOperand === 0) {
-            dataReset();
-            display.innerText = 0;
-        }        
+        dataResetAfterDeletingAllSymbols(firstOperand);
     }
 
-    if (secondOperand && pressedButton.classList.contains('delete-number')) {
-        console.log(secondOperand, firstOperand);
+    if (pressedButton.classList.contains('delete-number') && !firstOperandExists) {
         secondOperand = secondOperand.slice(0, -1);
         display.innerText = firstOperand + operator + secondOperand;
+        dataResetAfterDeletingAllSymbols(secondOperand);
     }
 
-    if (firstOperand && !secondOperand && pressedButton.classList.contains('digital-inversion')) {
+    if (pressedButton.classList.contains('digital-inversion') && firstOperandExists) {
         firstOperand = firstOperand * (-1);
         intermediateResult = intermediateResult * (-1);
         display.innerText = firstOperand;
     }
 
-    if (secondOperand && pressedButton.classList.contains('digital-inversion')) {
+    if (pressedButton.classList.contains('digital-inversion') && !firstOperandExists) {
         secondOperand = secondOperand * (-1);
         display.innerText = firstOperand + operator + secondOperand;
     }
@@ -117,8 +114,14 @@ function dataReset() {
     separator = false;
 }
 
+function dataResetAfterDeletingAllSymbols(operand) {
+    if (operand === 0) {
+        dataReset();
+        display.innerText = 0;
+    }
+}
+
 function getIntermediateResult() {
-    console.log(firstOperand, secondOperand, operator);
     switch (operator) {
         case '+':
             intermediateResult = Number(firstOperand) + Number(secondOperand);
@@ -136,4 +139,6 @@ function getIntermediateResult() {
 
     operator = '';
     secondOperand = '';
+
+    return intermediateResult;
 }
