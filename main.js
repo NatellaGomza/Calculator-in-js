@@ -12,15 +12,49 @@ operationField.addEventListener('click', getValueOfPressedButton);
 
 function getValueOfPressedButton(event) {
     let pressedButton = event.target;
-    let enteringFirstOperand = pressedButton.classList.contains('operand') && !operator;
+    let firstOperandExists = firstOperand && !secondOperand;
 
-    if (enteringFirstOperand) {
+    gettingFirstOperand(pressedButton);
+
+    settingValueOfFirstOperandIfIntermediateResultExist();
+
+    addingFractionalPartToFirstOperand(pressedButton);
+
+    settingOperator(pressedButton);
+
+    changingOperatorWhenOnlyFirstOperandExist(pressedButton);
+
+    gettingSecondOperand(pressedButton);
+
+    addingFractionalPartToSecondOperand(pressedButton);
+
+    gettingSquareRoot(pressedButton);
+
+    deletingNumbersFromOperands(pressedButton, firstOperandExists);
+
+    changingOperandFromPositiveToNegative(pressedButton, firstOperandExists);
+
+    gettingResult(pressedButton);
+
+    clearingResult(pressedButton);
+}
+
+function gettingFirstOperand(pressedButton) {
+    let addingNumbersToFirstOperand = pressedButton.classList.contains('operand') && !operator;
+
+    if (addingNumbersToFirstOperand) {
         firstOperand += pressedButton.innerText;
         display.innerText = firstOperand;
-    } else if (intermediateResult && !secondOperand) {
+    }
+}
+
+function settingValueOfFirstOperandIfIntermediateResultExist() {
+    if (intermediateResult && !secondOperand) {
         firstOperand = intermediateResult;
     }
+}
 
+function addingFractionalPartToFirstOperand(pressedButton) {
     let addingFractionalPartToFirstOperand = pressedButton.classList.contains('separator') && !operator && !separator;
 
     if (addingFractionalPartToFirstOperand) {
@@ -28,29 +62,37 @@ function getValueOfPressedButton(event) {
         display.innerText = firstOperand;
         separator = true;
     }
+}
 
+function settingOperator(pressedButton) {
     if (pressedButton.classList.contains('operator')) {
         separator = false;
         getIntermediateResult();
         operator = pressedButton.innerText;
         display.innerText = intermediateResult + operator;
     }
+}
 
-    let changingOperatorWhenOnlyFirstOperandExist = !secondOperand && !intermediateResult;
+function changingOperatorWhenOnlyFirstOperandExist(pressedButton) {
+    let operatorToChange = !secondOperand && !intermediateResult;
 
-    if (pressedButton.classList.contains('operator') && changingOperatorWhenOnlyFirstOperandExist) {
+    if (pressedButton.classList.contains('operator') && operatorToChange) {
         operator = '';
         operator = pressedButton.innerText;
         display.innerText = firstOperand + operator;;
     }
+}
 
+function gettingSecondOperand(pressedButton) {
     let enteringSecondOperand = !!firstOperand && operator && pressedButton.classList.contains('operand');
 
     if (enteringSecondOperand) {
         secondOperand += pressedButton.innerText;
         display.innerText = firstOperand + operator + secondOperand;
     }
+}
 
+function addingFractionalPartToSecondOperand(pressedButton) {
     let addingFractionalPartToSecondOperand = firstOperand && operator && !separator && pressedButton.classList.contains('separator');
 
     if (addingFractionalPartToSecondOperand) {
@@ -58,51 +100,67 @@ function getValueOfPressedButton(event) {
         display.innerText = secondOperand.length > 0 ? firstOperand + operator + secondOperand : display.innerText += secondOperand;
         separator = true;
     }
+}
 
-    if (pressedButton.classList.contains('result-button')) {
-        separator = false;
-        if (!secondOperand) {
-            display.innerText = firstOperand;
-        } else {
-            getIntermediateResult();
-            display.innerText = intermediateResult.toFixed(8);
-            firstOperand = '';
-        }
-    }
-
-    if (pressedButton.classList.contains('clear-button')) {
-        dataReset();
-        display.innerText = 0;
-    }
-
+function gettingSquareRoot(pressedButton) {
     if (pressedButton.classList.contains('square-root')) {
         intermediateResult = !secondOperand ? Math.sqrt(firstOperand).toFixed(8) : Math.sqrt(getIntermediateResult()).toFixed(8);
         display.innerText = intermediateResult;
     }
+}
 
-    let firstOperandExists = firstOperand && !secondOperand;
+function deletingNumbersFromOperands(pressedButton, firstOperandExists) {
 
-    if (pressedButton.classList.contains('delete-number') && firstOperandExists) {
+    if (!pressedButton.classList.contains('delete-number')) {
+        return;
+    }
+
+    if (firstOperandExists) {
         firstOperand = firstOperand.length > 1 ? firstOperand.slice(0, -1) : 0;
         display.innerText = firstOperand;
         dataResetAfterDeletingAllSymbols(firstOperand);
-    }
-
-    if (pressedButton.classList.contains('delete-number') && !firstOperandExists) {
+    } else {
         secondOperand = secondOperand.slice(0, -1);
         display.innerText = firstOperand + operator + secondOperand;
         dataResetAfterDeletingAllSymbols(secondOperand);
     }
+}
 
-    if (pressedButton.classList.contains('digital-inversion') && firstOperandExists) {
+function changingOperandFromPositiveToNegative(pressedButton, firstOperandExists) {
+    if (!pressedButton.classList.contains('digital-inversion')) {
+        return;
+    }
+
+    if (firstOperandExists) {
         firstOperand = firstOperand * (-1);
         intermediateResult = intermediateResult * (-1);
         display.innerText = firstOperand;
-    }
-
-    if (pressedButton.classList.contains('digital-inversion') && !firstOperandExists) {
+    } else {
         secondOperand = secondOperand * (-1);
         display.innerText = firstOperand + operator + secondOperand;
+    }
+}
+
+function gettingResult(pressedButton) {
+    if (!pressedButton.classList.contains('result-button')) {
+        return;
+    }
+
+    separator = false;
+
+    if (!secondOperand) {
+        display.innerText = firstOperand;
+    } else {
+        getIntermediateResult();
+        display.innerText = intermediateResult.toFixed(8);
+        firstOperand = '';
+    }
+}
+
+function clearingResult(pressedButton) {
+    if (pressedButton.classList.contains('clear-button')) {
+        dataReset();
+        display.innerText = 0;
     }
 }
 
