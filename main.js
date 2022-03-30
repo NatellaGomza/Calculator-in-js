@@ -137,7 +137,6 @@ function changingOperandFromPositiveToNegative(pressedButton, firstOperandExists
 
     if (firstOperandExists) {
         firstOperand = firstOperand * (-1);
-        intermediateResult = intermediateResult * (-1);
         display.innerText = firstOperand;
     } else if (intermediateResult && !secondOperand) {
         intermediateResult = intermediateResult * (-1);
