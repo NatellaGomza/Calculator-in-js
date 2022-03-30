@@ -189,19 +189,19 @@ function dataResetAfterDeletingAllSymbols(operand) {
 function getIntermediateResult() {
     switch (operator) {
         case '+':
-            let sum = Number(firstOperand) + Number(secondOperand)
+            const sum = Number(firstOperand) + Number(secondOperand)
             intermediateResult = (sum % 1 === 0) ? sum : sum.toFixed(8);
             break;
         case '−':
-            let difference = firstOperand - secondOperand
+            const difference = firstOperand - secondOperand
             intermediateResult = (difference % 1 === 0) ? difference : difference.toFixed(8);
             break;
         case '∗':
-            let multiplication = firstOperand * secondOperand
+            const multiplication = firstOperand * secondOperand
             intermediateResult = (multiplication % 1 === 0) ? multiplication : multiplication.toFixed(8);
             break;
         case '÷':
-            let division = firstOperand / secondOperand
+            const division = firstOperand / secondOperand
             intermediateResult = (division % 1 === 0) ? division : division.toFixed(8);
             break;
     }
