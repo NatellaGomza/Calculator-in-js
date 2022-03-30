@@ -67,7 +67,9 @@ function addingFractionalPartToFirstOperand(pressedButton) {
 function settingOperator(pressedButton) {
     if (pressedButton.classList.contains('operator')) {
         separator = false;
+
         getIntermediateResult();
+
         operator = pressedButton.innerText;
         display.innerText = intermediateResult + operator;
     }
@@ -118,10 +120,12 @@ function deletingNumbersFromOperands(pressedButton, firstOperandExists) {
     if (firstOperandExists) {
         firstOperand = firstOperand.length > 1 ? firstOperand.slice(0, -1) : 0;
         display.innerText = firstOperand;
+
         dataResetAfterDeletingAllSymbols(firstOperand);
     } else {
         secondOperand = secondOperand.slice(0, -1);
         display.innerText = firstOperand + operator + secondOperand;
+
         dataResetAfterDeletingAllSymbols(secondOperand);
     }
 }
@@ -152,7 +156,8 @@ function gettingResult(pressedButton) {
         display.innerText = firstOperand;
     } else {
         getIntermediateResult();
-        display.innerText = intermediateResult.toFixed(8);
+
+        display.innerText = intermediateResult;
         firstOperand = '';
     }
 }
@@ -160,6 +165,7 @@ function gettingResult(pressedButton) {
 function clearingResult(pressedButton) {
     if (pressedButton.classList.contains('clear-button')) {
         dataReset();
+
         display.innerText = 0;
     }
 }
@@ -175,6 +181,7 @@ function dataReset() {
 function dataResetAfterDeletingAllSymbols(operand) {
     if (operand === 0) {
         dataReset();
+        
         display.innerText = 0;
     }
 }
@@ -182,16 +189,20 @@ function dataResetAfterDeletingAllSymbols(operand) {
 function getIntermediateResult() {
     switch (operator) {
         case '+':
-            intermediateResult = Number(firstOperand) + Number(secondOperand);
+            let sum = Number(firstOperand) + Number(secondOperand)
+            intermediateResult = (sum % 1 === 0) ? sum : sum.toFixed(8);
             break;
         case '−':
-            intermediateResult = firstOperand - secondOperand;
+            let difference = firstOperand - secondOperand
+            intermediateResult = (difference % 1 === 0) ? difference : difference.toFixed(8);
             break;
         case '∗':
-            intermediateResult = firstOperand * secondOperand;
+            let multiplication = firstOperand * secondOperand
+            intermediateResult = (multiplication % 1 === 0) ? multiplication : multiplication.toFixed(8);
             break;
         case '÷':
-            intermediateResult = firstOperand / secondOperand;
+            let division = firstOperand / secondOperand
+            intermediateResult = (division % 1 === 0) ? division : division.toFixed(8);
             break;
     }
 
